@@ -61,13 +61,13 @@ button:hover {
   border-radius: 10px;
   width: 73vw;
   margin: 50px 0;
-  height: 13vw;
-  padding: 5px 30px;
+  height: 11vw;
+  padding: 10px 30px;
   align-items: center;
 }
 
 .show-detail div {
-  height: 10vw;
+  height: 8vw;
   width: 250px;
   padding: 0 20px;
   border-right: 1px solid rgb(221, 226, 230);

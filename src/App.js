@@ -15,17 +15,20 @@ function App() {
 
   // const fetchData = async () => {
   //   try {
-  //     const res = await axios.get(`https://wookie.codesubmit.io/ipcheck?ip=${inputIp}`, {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: 'Bearer WookieIP2022'
+  //     const res = await axios.get(`https://wookie.codesubmit.io/ipcheck?ip=${inputIp}`,
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: 'Bearer WookieIP2022'
+  //         }
   //       }
-  //     })
+  //     )
   //     setLocation(res)
   //   } catch (err) {
   //     console.log(err)
   //   }
   // }
+
   const fetchData = () => {
     try{
       fetch(`http://ip-api.com/json/${inputIp}`)
