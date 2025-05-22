@@ -1,122 +1,68 @@
 import './App.css';
-import 'leaflet/dist/leaflet.css'
-import { MapContainer, Popup, TileLayer, Marker, ZoomControl } from 'react-leaflet';
-import banner from '../src/asset/image/pattern-bg.png';
+import banner from './asset/image/pattern-bg.png';
 import { useEffect, useState } from 'react';
-import L from 'leaflet'
-import iconLocate from '../src/asset/image/icon-location.svg'
-import iconArrow from '../src/asset/image/icon-arrow.svg'
-import axios from 'axios';
+import { getIpInfo } from './services/ipService';
+import { IP_ADDRESS_REGEX } from './constants';
+import IpInputForm from './components/IpInputForm';
+import IpDetailsDisplay from './components/IpDetailsDisplay';
+import MapDisplay from './components/MapDisplay';
 
 function App() {
-  const [location, setLocation] = useState('');
-  const [inputIp, setInputIp] = useState('')
+  const [location, setLocation] = useState(null); // Initialize with null
+  const [inputIp, setInputIp] = useState('');
+  const [error, setError] = useState(null); // State for managing error messages
 
-
-  // const fetchData = async () => {
-  //   try {
-  //     const res = await axios.get(`https://wookie.codesubmit.io/ipcheck?ip=${inputIp}`,
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: 'Bearer WookieIP2022'
-  //         }
-  //       }
-  //     )
-  //     setLocation(res)
-  //   } catch (err) {
-  //     console.log(err)
-  //   }
-  // }
-
-  const fetchData = () => {
-    try{
-      fetch(`http://ip-api.com/json/${inputIp}`)
-        .then(response => response.json())
-        .then(data => setLocation(data))
-    }catch(err){
-      console.log(err)
+  const fetchData = async (ip) => {
+    setError(null); // Clear previous errors
+    try {
+      const data = await getIpInfo(ip);
+      if (data && data.status !== 'fail') { // ip-api returns status: 'fail' for private/invalid IPs
+        setLocation(data);
+        setError(null); // Clear error on success
+      } else {
+        setLocation(null);
+        setError(data && data.message ? `Error: ${data.message}` : "Failed to fetch IP information. Invalid IP or private address.");
+        console.error("fetchData: No data received or API error status", data);
+      }
+    } catch (err) {
+      console.error("Error in App fetchData:", err);
+      setLocation(null); // Clear location on error
+      setError("Failed to fetch IP information. Please check your connection or try again later.");
     }
-  }
+  };
 
   useEffect(() => {
-    fetchData()
+    fetchData(); // Fetches data for the current user's IP on initial load
   }, [])
 
   // IP Test
-  var rx = /^(?!0)(?!.*\.$)((1?\d?\d|25[0-5]|2[0-4]\d)(\.|$)){4}$/;
-  const isIP = rx.test(inputIp)
+  const isIPValid = IP_ADDRESS_REGEX.test(inputIp);
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSearch = () => {
+    if (inputIp && !isIPValid) {
+      alert("Invalid IP Address format."); // Or set an error state
+      return;
+    }
+    fetchData(inputIp); // Fetch data for the entered IP on submit (or current if inputIp is empty)
+  };
 
-  }
-
-  const mapIcon = L.icon({
-    iconUrl: iconLocate,
-    iconSize: [33, 40],
-    iconAnchor: [12, 12],
-    popupAnchor: [0, 0],
-  });
-
-  let center = [location.lat, location.lon];
   return (
     <div>
       <div className='upper-page'>
         <img src={banner} alt='banner' />
       </div>
-      <div className='input-ip'>
+      <div className='input-ip'> {/* This class might need to be on the IpInputForm/IpDetailsDisplay root for styling */}
         <h1>IP Address Tracker</h1>
-        <form onSubmit={handleSubmit}>
-          <input
-            type='text'
-            placeholder='IP Address'
-            value={inputIp}
-            onChange={(e) => setInputIp(e.target.value)}
-          />
-          <button type='submit' onClick={() => fetchData()} disabled={!isIP}>
-            <img src={iconArrow} alt='icon' />
-          </button>
-        </form>
-        <div className='show-detail'>
-          <div>
-            <p>IP ADDRESS</p>
-            <h2>{location.query}</h2>
-          </div>
-          <div>
-            <p>LOCATION</p>
-            <h2>{location.regionName}</h2>
-          </div>
-          <div>
-            <p>Time Zone</p>
-            <h2>{location.timezone}</h2>
-          </div>
-          <div style={{ border: 'none' }}>
-            <p>ISP</p>
-            <h2>{location.isp}</h2>
-          </div>
-        </div>
+        <IpInputForm
+          inputIp={inputIp}
+          setInputIp={setInputIp}
+          handleSearch={handleSearch}
+          isIPValid={isIPValid}
+        />
+        {error && <p className="error-message">{error}</p>}
+        <IpDetailsDisplay locationData={location} />
       </div>
-      {location && <div className='lower-page'>
-        <MapContainer
-          center={[23, 45]}
-          zoom={2}
-          style={{ width: '100vw', height: '65vh', zIndex: '0' }}
-          zoomControl={false}
-        >
-          <TileLayer
-            url="https://api.maptiler.com/maps/basic/256/{z}/{x}/{y}.png?key=WhudaG1AvZgpeFPYlf14"
-            attribution='<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
-          />
-          <ZoomControl position='bottomright' />
-
-          <Marker position={[location.lat, location.lon]} icon={mapIcon} >
-            <Popup>
-              {location.regionName} <br /> {location.query} <br /> {location.isp}
-            </Popup>
-          </Marker>
-        </MapContainer>
-      </div>}
+      <MapDisplay locationData={location} />
     </div>
   );
 }

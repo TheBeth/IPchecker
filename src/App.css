@@ -76,6 +76,13 @@ button:hover {
   
 }
 
+.error-message {
+  color: red;
+  margin-top: 10px;
+  text-align: center; /* Center the error message below the form */
+  font-weight: bold;
+}
+
 .show-detail p {
   color: gray;
   font-size: smaller;
