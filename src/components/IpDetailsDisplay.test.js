@@ -51,7 +51,7 @@ describe('IpDetailsDisplay', () => {
 
     expect(screen.getByText('Time Zone')).toBeInTheDocument();
     expect(screen.getAllByText('-')[2]).toBeInTheDocument(); // timezone will be '-'
-    
+
     expect(screen.getByText('ISP')).toBeInTheDocument();
     expect(screen.getAllByText('-')[3]).toBeInTheDocument(); // isp will be '-'
   });
@@ -59,7 +59,7 @@ describe('IpDetailsDisplay', () => {
   // Test Case 3: Renders null when locationData itself is null
   it('should render null when locationData is null', () => {
     const { container } = render(<IpDetailsDisplay locationData={null} />);
-    
+
     // When locationData is null, the component returns null, so the container should be empty.
     expect(container.firstChild).toBeNull();
   });

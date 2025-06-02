@@ -14,7 +14,7 @@ function MapDisplay({ locationData }) {
   });
 
   // Use locationData.lat and locationData.lon for the marker and map center if available
-  
+
   // Determine position and zoom based on locationData
   const isValidLocation = locationData && typeof locationData.lat !== 'undefined' && typeof locationData.lon !== 'undefined';
   const position = isValidLocation ? [locationData.lat, locationData.lon] : DEFAULT_MAP_CENTER;
@@ -23,7 +23,7 @@ function MapDisplay({ locationData }) {
   // Conditional rendering based on valid location, or always render with default if preferred.
   // For this task, maintaining the original behavior: only render if valid location.
   if (!isValidLocation) {
-    return null; 
+    return null;
   }
 
   return (
@@ -41,8 +41,8 @@ function MapDisplay({ locationData }) {
         <ZoomControl position='bottomright' />
         <Marker position={position} icon={mapIcon}>
           <Popup>
-            {locationData.regionName || 'N/A'} <br /> 
-            {locationData.query || 'N/A'} <br /> 
+            {locationData.regionName || 'N/A'} <br />
+            {locationData.query || 'N/A'} <br />
             {locationData.isp || 'N/A'}
           </Popup>
         </Marker>
